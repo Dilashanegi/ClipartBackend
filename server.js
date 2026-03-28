@@ -4,10 +4,7 @@ const Replicate = require("replicate");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
-
+console.log("Starting server...");
 console.log("Token loaded:", !!process.env.REPLICATE_API_TOKEN);
 
 const app = express();
@@ -20,6 +17,10 @@ const limiter = rateLimit({
   max: 20,
 });
 app.use(limiter);
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
 
 const STYLE_PROMPTS = {
   cartoon: "cartoon style, vibrant colors, thick outlines, fun and playful",
@@ -43,31 +44,28 @@ app.post("/generate", async (req, res) => {
 
     const prompt = STYLE_PROMPTS[style];
 
-
     const output = await replicate.run(
-      "stability-ai/sdxl:39ed52f2319f9b1d4a99eba3a84dce0a9b4b0a7b",
+      "tencentarc/photomaker:ddfc2b08d209f9fa8c1eca692712918bd449f695d6f166e5c5619afa5f3b9a29",
       {
         input: {
           prompt: `${prompt}, portrait, high quality`,
           input_image: imageBase64,
-          strength: 0.7,
+          style_strength_ratio: 35,
           num_inference_steps: 30,
         },
       }
     );
 
-    
-
     res.json({ success: true, imageUrl: output[0] });
 
   } catch (error) {
-    console.error("Generation error:", error);
-    res.status(500).json({ error: "Generation failed" });
+    console.error("Generation error:", error.message);
+    res.status(500).json({ error: "Generation failed", details: error.message });
   }
 });
 
 app.get("/", (req, res) => {
-  res.json({ status: "ClipArt AI backend running!" });
+  res.json({ status: "ClipArt AI backend running!", tokenLoaded: !!process.env.REPLICATE_API_TOKEN });
 });
 
 const PORT = process.env.PORT || 3000;
