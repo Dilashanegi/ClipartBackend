@@ -3,6 +3,7 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 const fetch = require("node-fetch");
 const FormData = require("form-data");
+const sharp = require("sharp");
 require("dotenv").config();
 
 console.log("Starting server...");
@@ -44,8 +45,14 @@ app.post("/generate", async (req, res) => {
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     const imageBuffer = Buffer.from(base64Data, "base64");
 
+    // resize to exactly 1024x1024 ← this fixes the error!
+    const resizedBuffer = await sharp(imageBuffer)
+      .resize(1024, 1024, { fit: "cover" })
+      .jpeg()
+      .toBuffer();
+
     const formData = new FormData();
-    formData.append("init_image", imageBuffer, {
+    formData.append("init_image", resizedBuffer, {
       filename: "image.jpg",
       contentType: "image/jpeg",
     });
@@ -82,7 +89,6 @@ app.post("/generate", async (req, res) => {
 
     const data = await response.json();
     const imageUrl = `data:image/png;base64,${data.artifacts[0].base64}`;
-
     res.json({ success: true, imageUrl });
   } catch (error) {
     console.error("Generation error:", error.message);
