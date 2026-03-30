@@ -23,6 +23,6 @@ Backend
 Repo: https://github.com/Dilashanegi/ClipartBackend
 Deployed on Render.com
 Uses Stability AI API for image transformation
-APK Download Download APK ← add link after build
+APK Download Download APK  https://drive.google.com/file/d/11LDw81AsktSYuDNHCm_3MGv9QOttf5Og/view?usp=share_link
 
-Screen Recording Watch Demo ← add link after recording
+Screen Recording Watch Demo https://drive.google.com/file/d/10Ph-G8drPEZp_ZgbgSCYQZhRXg-Vx0ya/view?usp=sharing
